@@ -2,6 +2,7 @@ require('dotenv').config()
 
 export const config = {
   port: process.env.PORT,
+  frontEndBaseUrl: process.env.FRONTEND_HOST,
   mongo: {
     uri: process.env.DB_HOST
   },

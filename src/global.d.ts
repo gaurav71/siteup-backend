@@ -3,6 +3,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       NODE_ENV: 'development' | 'production';
+      FRONTEND_HOST: string;
       PORT: string;
       DB_HOST: string;
       REDIS_HOST: string;

@@ -11,9 +11,9 @@ const startApp = async() => {
   const app = express()
 
   app.use(cors({
-    origin: 'http://localhost:8000',
+    origin: config.frontEndBaseUrl,
     credentials: true
-  }));
+  }))
 
   app.use(sessionService())
 
