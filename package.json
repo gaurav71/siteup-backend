@@ -1,0 +1,44 @@
+{
+  "name": "siteup-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "watch": "tsc -w",
+    "start": "node dist/index.js",
+    "start:tsnode": "ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^2.23.0",
+    "bull": "^3.22.0",
+    "connect-redis": "^5.1.0",
+    "crypto-js": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "express-session": "^1.17.1",
+    "graphql": "^15.5.0",
+    "is-reachable": "^5.0.0",
+    "lodash": "^4.17.21",
+    "mongoose": "^5.12.4",
+    "nodemailer": "^6.5.0",
+    "redis": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/bull": "^3.15.0",
+    "@types/connect-redis": "0.0.16",
+    "@types/express": "^4.17.11",
+    "@types/express-session": "^1.17.3",
+    "@types/lodash": "^4.14.168",
+    "@types/mongoose": "^5.10.4",
+    "@types/node": "^14.14.41",
+    "@types/nodemailer": "^6.4.1",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
