@@ -5,6 +5,7 @@ import { sendMail } from '../services/mailer'
 import { siteDownEmailFormat } from '../utilities/textFormatter'
 import { UpdateQuery } from 'mongoose'
 import { Mutable } from '../@types/mutable'
+import AuditLog from '../schema/auditLog'
 
 export const processJob = async (job: Job) => {
   const { url, jobId } = job.data
@@ -60,6 +61,12 @@ export const processJob = async (job: Job) => {
       })
     }
   }
+
+  await new AuditLog({
+    jobId: siteupCheckerJob._id,
+    userId: siteupCheckerJob.userId,
+    status: isWebsiteUp
+  }).save()
 
   await SiteUpCheckerJob.findOneAndUpdate(
     { _id: jobId },

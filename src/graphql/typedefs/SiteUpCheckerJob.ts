@@ -61,4 +61,8 @@ export const SiteUpCheckerJob = gql`
     checkMultipleSitesStatus(jobIds: [String!]!): [SiteUpCheckerJob!]!
     checkAllUserSitesStatus: [SiteUpCheckerJob!]!
   }
+
+  extend type Subscription {
+    siteUpCheckerJobUpdated: SiteUpCheckerJob!
+  }
 `

@@ -6,6 +6,7 @@ import { siteUpCheckerJobQueue } from '../services/Queues'
 import { checkAuth } from "../utilities/checkAuth"
 import { statusTypes as STATUS_TYPES } from '../schema/siteUpCheckerJob'
 import { checkUrlStatus } from "../utilities/checkUrlStatus"
+import AuditLog from '../schema/auditLog'
 
 export const getSiteUpCheckerJobByIdController = async(jobId: string, context: Context) => {
   checkAuth(context)
@@ -149,6 +150,12 @@ export const checkSiteStatusController = async(jobId: string, context: Context) 
   }
 
   const isWebsiteUp = await checkUrlStatus(job.url)
+
+  await new AuditLog({
+    jobId: job._id,
+    userId: job.userId,
+    status: isWebsiteUp
+  }).save()
 
   return SiteUpCheckerJob.findOneAndUpdate(
     { _id: jobId },

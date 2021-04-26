@@ -17,11 +17,18 @@ import {
   startSiteUpCheckerJob
 } from "./siteUpCheckerJob";
 
+import {
+  getSiteAuditLogs,
+  getSiteFailureAuditLogs
+} from './auditLog'
+
 export const queries = {
   user,
   login,
   getSiteUpCheckerJobById,
-  getUserSiteUpCheckerJobs
+  getUserSiteUpCheckerJobs,
+  getSiteAuditLogs,
+  getSiteFailureAuditLogs
 }
 
 export const mutations = {

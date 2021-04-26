@@ -52,3 +52,7 @@ export const checkMultipleSitesStatus = (parent: any, args: { jobIds: string[] }
 export const checkAllUserSitesStatus = (parent: any, args: any, context: Context, info: any) => {
   return checkAllUserSitesStatusController(context)
 }
+
+// export const siteUpCheckerJobUpdated = {
+//   subscribe: () => pubsub.asyncIterator(['POST_CREATED'])
+// }

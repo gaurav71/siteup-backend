@@ -5,10 +5,12 @@ import { typeDefs, resolvers } from '../graphql'
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req, res }): Context => ({
-    req,
-    res
-  }),
+  context: ({ req, res, connection }): Context => {
+    return {
+      req,
+      res
+    }
+  },
   playground: {
     settings: {
       "request.credentials": "include"
