@@ -14,7 +14,8 @@ import {
   updateSiteUpCheckerJob,
   checkMultipleSitesStatus,
   checkAllUserSitesStatus,
-  startSiteUpCheckerJob
+  startSiteUpCheckerJob,
+  siteUpCheckerJobUpdated
 } from "./siteUpCheckerJob";
 
 import {
@@ -41,4 +42,8 @@ export const mutations = {
   removeSiteUpCheckerJob,
   checkMultipleSitesStatus,
   checkAllUserSitesStatus
+}
+
+export const subscriptions = {
+  siteUpCheckerJobUpdated
 }

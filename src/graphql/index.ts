@@ -1,13 +1,23 @@
-import { queries, mutations } from "./resolvers";
+import { queries, mutations, subscriptions } from "./resolvers";
+import { subscriptionTypes } from "./subscriptionTypes";
 import { schemaArray } from "./typedefs";
 
-export const typeDefs = schemaArray
+const typeDefs = schemaArray
 
-export const resolvers = {
+const resolvers = {
   Query: {
     ...queries
   },
   Mutation: {
     ...mutations
+  },
+  Subscription: {
+    ...subscriptions
   }
 };
+
+export {
+  resolvers,
+  typeDefs,
+  subscriptionTypes
+}

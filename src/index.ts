@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { connectToDb } from './services/mongo'
-import { server } from './services/graphql'
+import { startApolloServer } from './services/graphql'
 import { sessionService } from './services/session'
 import { config } from './config/config'
 
@@ -15,11 +15,13 @@ const startApp = async() => {
     credentials: true
   }))
 
-  app.use(sessionService())
+  const sessionMiddleWare = sessionService()
 
-  server.applyMiddleware({ app, cors: false })
+  app.use(sessionMiddleWare)
 
-  app.listen(config.port, () => {
+  const { httpServer } = await startApolloServer(app, sessionMiddleWare)
+
+  httpServer.listen(config.port, () => {
     console.log(`The app is listening on port ${config.port}!`);
   })
 }

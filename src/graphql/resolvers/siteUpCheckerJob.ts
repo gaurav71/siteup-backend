@@ -1,3 +1,4 @@
+import { withFilter } from 'apollo-server-express'
 import { Context } from "../../@types/context"
 
 import {
@@ -53,6 +54,9 @@ export const checkAllUserSitesStatus = (parent: any, args: any, context: Context
   return checkAllUserSitesStatusController(context)
 }
 
-// export const siteUpCheckerJobUpdated = {
-//   subscribe: () => pubsub.asyncIterator(['POST_CREATED'])
-// }
+export const siteUpCheckerJobUpdated = {
+  subscribe: withFilter(
+    (_: any, args: any, context: Context) => context.pubsub.asyncIterator([context.subscriptionTypes.SITE_UP_CHECKERJOB_UPDATED]),
+    (payload, variables) => payload.siteUpCheckerJobUpdated.userId === variables.userId,
+  ) ,
+}

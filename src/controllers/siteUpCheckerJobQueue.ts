@@ -6,6 +6,8 @@ import { siteDownEmailFormat } from '../utilities/textFormatter'
 import { UpdateQuery } from 'mongoose'
 import { Mutable } from '../@types/mutable'
 import AuditLog from '../schema/auditLog'
+import { subscriptionTypes } from '../graphql'
+import { pubsub } from '../services/graphql'
 
 export const processJob = async (job: Job) => {
   const { url, jobId } = job.data
@@ -68,13 +70,17 @@ export const processJob = async (job: Job) => {
     status: isWebsiteUp
   }).save()
 
-  await SiteUpCheckerJob.findOneAndUpdate(
+  const updatedJob = await SiteUpCheckerJob.findOneAndUpdate(
     { _id: jobId },
     {
       ...updateObject,
       lastUpdatedOn: Date.now()
     }
   )
+
+  pubsub.publish(subscriptionTypes.SITE_UP_CHECKERJOB_UPDATED, {
+    siteUpCheckerJobUpdated: updatedJob
+  })
 
   return Promise.resolve({
     url,

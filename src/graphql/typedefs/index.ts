@@ -1,4 +1,4 @@
-import { AuditLog } from './auditLog'
+import { AuditLog } from './AuditLog'
 import { root } from "./root"
 import { SiteUpCheckerJob } from "./SiteUpCheckerJob"
 import { user } from "./User"

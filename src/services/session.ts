@@ -17,3 +17,5 @@ export const sessionService = () => session({
     sameSite: config.session.cookie.sameSite
   }
 })
+
+export type SessionMiddleWareType = ReturnType<typeof sessionService>

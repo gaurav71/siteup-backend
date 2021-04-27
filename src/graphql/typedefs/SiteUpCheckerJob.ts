@@ -63,6 +63,6 @@ export const SiteUpCheckerJob = gql`
   }
 
   extend type Subscription {
-    siteUpCheckerJobUpdated: SiteUpCheckerJob!
+    siteUpCheckerJobUpdated(userId: String!): SiteUpCheckerJob!
   }
 `
