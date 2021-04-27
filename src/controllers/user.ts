@@ -1,3 +1,5 @@
+import CryptoJS from 'crypto-js'
+import { v4 as uuidv4 } from 'uuid'
 import { Context } from "../@types/context"
 import { CreateUserInput, LoginUserInput } from "../graphql/typedefs/User"
 import { User } from "../schema"
@@ -18,11 +20,16 @@ export const createUserController = async(input: CreateUserInput, context: Conte
     throw new Error(message)
   }
 
+  const secret = uuidv4()
+
+  const hashedPassword = CryptoJS.AES.encrypt(input.password, secret).toString()
+
   const userDoc = new User({
     userName: input.userName,
     email: input.email,
-    password: input.password,
-    sendMailOnFailure: input.sendMailOnFailure
+    password: hashedPassword,
+    sendMailOnFailure: input.sendMailOnFailure,
+    secret
   })
 
   const user = await userDoc.save()
@@ -34,12 +41,18 @@ export const createUserController = async(input: CreateUserInput, context: Conte
 
 export const loginUserController = async(input: LoginUserInput, context: Context) => {
   const user = await User.findOne({
-    email: input.email,
-    password: input.password
+    email: input.email
   })
 
   if (!user) {
     throw new Error('User not found')
+  }
+ 
+  const bytes  = CryptoJS.AES.decrypt(user.password, user.secret)
+  const originalPassword = bytes.toString(CryptoJS.enc.Utf8)
+
+  if (originalPassword !== input.password) {
+    throw new Error('Wrong Password')
   }
 
   context.req.session.userId = user._id

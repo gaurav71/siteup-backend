@@ -17,6 +17,10 @@ const userSchema = new Schema<User, Model<User>>({
     type: String,
     required: true
   },
+  secret: {
+    type: String,
+    required: true
+  },
   userType: {
     type: String,
     required: true,
@@ -40,6 +44,7 @@ export interface IUser {
   password: string;
   userType: string;
   sendMailOnFailure: boolean;
+  secret: string;
 }
 
 interface User extends IUser, Document {
