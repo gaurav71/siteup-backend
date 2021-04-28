@@ -1,5 +1,7 @@
 import {
   createUser,
+  verifyUser,
+  resenedVericiationMail,
   login,
   logout,
   user
@@ -34,6 +36,7 @@ export const queries = {
 
 export const mutations = {
   createUser,
+  verifyUser,
   logout,
   createSiteUpCheckerJob,
   updateSiteUpCheckerJob,
@@ -41,7 +44,8 @@ export const mutations = {
   startSiteUpCheckerJob,
   removeSiteUpCheckerJob,
   checkMultipleSitesStatus,
-  checkAllUserSitesStatus
+  checkAllUserSitesStatus,
+  resenedVericiationMail
 }
 
 export const subscriptions = {

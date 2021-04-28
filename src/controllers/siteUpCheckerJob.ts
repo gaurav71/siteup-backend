@@ -29,6 +29,10 @@ export const getUserSiteUpCheckerJobsController = (context: Context) => {
 export const createSiteUpCheckerJobController = async(createInput: CreateSiteUpCheckerJobInput, context: Context) => {
   checkAuth(context)
 
+  if (createInput.sendMailOnFailure && typeof createInput.resetAfterDownCount !== 'number') {
+    throw new Error('resetAfterDownCount is required')
+  }
+
   const job = await new SiteUpCheckerJob({
     ...createInput,
     userId: context.req.session.userId,
@@ -51,6 +55,10 @@ export const updateSiteUpCheckerJobController = async(updateInput: UpdateSiteUpC
 
   if (!job || context.req.session.userId !== job.userId) {
     throw new Error('Job not found')
+  }
+
+  if (updateInput.sendMailOnFailure && typeof updateInput.resetAfterDownCount !== 'number') {
+    throw new Error('resetAfterDownCount is required')
   }
 
   if (updateInput.cron !== job.cron) {

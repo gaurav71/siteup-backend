@@ -1,9 +1,29 @@
 import CryptoJS from 'crypto-js'
 import { v4 as uuidv4 } from 'uuid'
 import { Context } from "../@types/context"
+import { config } from '../config/config'
 import { CreateUserInput, LoginUserInput } from "../graphql/typedefs/User"
 import { User } from "../schema"
+import { userStatusTypes } from '../schema/user'
+import { sendMail } from '../services/mailer'
+import { delRedisKey, getRedisKey, REDIS_KEY_PREFIXES, setRedisKey } from '../services/redis'
 import { checkAuth } from "../utilities/checkAuth"
+import { userAccountCreatedEmailFormat } from '../utilities/messageFormatter'
+
+const sendVerificationMail = async(user: User) => {
+  const verificationToken = uuidv4()
+
+  await setRedisKey(
+    `${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${verificationToken}`,
+    JSON.stringify({ userId: user._id, creationTime: Date.now() })
+  )
+
+  sendMail({
+    to: user.email,
+    from: config.officialEmail,
+    ...userAccountCreatedEmailFormat(user, verificationToken)
+  })
+}
 
 export const createUserController = async(input: CreateUserInput, context: Context) => {
   const userAlreadyCreated = await User.findOne({
@@ -29,14 +49,54 @@ export const createUserController = async(input: CreateUserInput, context: Conte
     email: input.email,
     password: hashedPassword,
     sendMailOnFailure: input.sendMailOnFailure,
+    status: userStatusTypes.UNVERIFIED,
     secret
   })
 
   const user = await userDoc.save()
 
-  context.req.session.userId = user._id
+  await sendVerificationMail(user)
 
-  return user
+  return 'Email with verification link is sent to your email.'
+}
+
+export const resendVerificationMailController = async(email: string) => {
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  if (user.status !== userStatusTypes.UNVERIFIED) {
+    throw new Error('User already verified')
+  }
+
+  await sendVerificationMail(user)
+
+  return 'Email with verification link is sent to your email.'
+}
+
+export const verifyUserController = async(token: string, context: Context) => {
+  const tokenDetails: any = await getRedisKey(`${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${token}`)
+
+  if (!tokenDetails) {
+    throw new Error('Invalid token')
+  }
+
+  const parsedTokenDetails = JSON.parse(tokenDetails)
+
+  await delRedisKey(`${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${token}`)
+
+  if (parsedTokenDetails.creationTime + config.verifyUserTimeLimit < Date.now()) {
+    throw new Error('Token expired')
+  }
+
+  context.req.session.userId = parsedTokenDetails.userId
+
+  return User.findOneAndUpdate(
+    { _id: parsedTokenDetails.userId },
+    { status: userStatusTypes.ACTIVE }
+  )
 }
 
 export const loginUserController = async(input: LoginUserInput, context: Context) => {
@@ -53,6 +113,14 @@ export const loginUserController = async(input: LoginUserInput, context: Context
 
   if (originalPassword !== input.password) {
     throw new Error('Wrong Password')
+  }
+
+  if (user.status === userStatusTypes.UNVERIFIED) {
+    throw new Error('Account not verified')
+  }
+
+  if (user.status !== userStatusTypes.ACTIVE) {
+    throw new Error('User not found')
   }
 
   context.req.session.userId = user._id

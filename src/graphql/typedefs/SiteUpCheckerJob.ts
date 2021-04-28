@@ -3,7 +3,7 @@ import { gql } from "apollo-server-express";
 export interface CreateSiteUpCheckerJobInput {
   url: string;
   cron: string;
-  resetAfterDownCount: number;
+  resetAfterDownCount?: number;
   sendMailOnFailure: boolean;
 }
 
@@ -11,7 +11,7 @@ export interface UpdateSiteUpCheckerJobInput {
   jobId: string;
   cron: string;
   sendMailOnFailure: boolean;
-  resetAfterDownCount: number;
+  resetAfterDownCount?: number;
 }
 
 export const SiteUpCheckerJob = gql`
@@ -21,12 +21,12 @@ export const SiteUpCheckerJob = gql`
     url: String!
     cron: String!
     status: String!
-    resetAfterDownCount: Float!
+    resetAfterDownCount: Float
     totalDownCounter: Float!
     downCounterBeforeReset: Float!
     lastCheckedOn: Float
     siteUpOnLastChecked: Boolean
-    sendMailOnFailure: Boolean
+    sendMailOnFailure: Boolean!
     lastFailureOn: Float
     lastFailureEmailSentOn: Float
     createdOn: Float!
@@ -36,14 +36,14 @@ export const SiteUpCheckerJob = gql`
   input CreateSiteUpCheckerJobInput {
     url: String!
     cron: String!
-    resetAfterDownCount: Float!
+    resetAfterDownCount: Float
     sendMailOnFailure: Boolean!
   }
 
   input UpdateSiteUpCheckerJobInput {
     jobId: String!
     cron: String!
-    resetAfterDownCount: Float!
+    resetAfterDownCount: Float
     sendMailOnFailure: Boolean!
   }
 

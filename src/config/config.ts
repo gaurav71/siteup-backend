@@ -22,5 +22,7 @@ export const config = {
       maxAge: 10 * 24 * 60 * 60 * 1000,
       httpOnly: true
     }
-  }
+  },
+  officialEmail: 'test@mail.com',
+  verifyUserTimeLimit: 1000 * 60 * 2,
 }

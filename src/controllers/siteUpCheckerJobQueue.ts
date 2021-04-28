@@ -2,12 +2,13 @@ import { Job } from 'bull'
 import { SiteUpCheckerJob, User } from '../schema'
 import { checkUrlStatus } from '../utilities/checkUrlStatus'
 import { sendMail } from '../services/mailer'
-import { siteDownEmailFormat } from '../utilities/textFormatter'
+import { siteDownEmailFormat } from '../utilities/messageFormatter'
 import { UpdateQuery } from 'mongoose'
 import { Mutable } from '../@types/mutable'
 import AuditLog from '../schema/auditLog'
 import { subscriptionTypes } from '../graphql'
 import { pubsub } from '../services/graphql'
+import { config } from '../config/config'
 
 export const processJob = async (job: Job) => {
   const { url, jobId } = job.data
@@ -36,31 +37,33 @@ export const processJob = async (job: Job) => {
 
     const sendMailOnFailure = user.sendMailOnFailure && siteupCheckerJob.sendMailOnFailure
 
-    const { downCounterBeforeReset, resetAfterDownCount } = siteupCheckerJob
+    if (sendMailOnFailure) {
+      const { downCounterBeforeReset, resetAfterDownCount } = siteupCheckerJob
 
-    const downCounterLevelReached = downCounterBeforeReset + 1 >= resetAfterDownCount
+      const downCounterLevelReached = downCounterBeforeReset + 1 >= resetAfterDownCount
 
-    if (downCounterLevelReached) {
-      Object.assign(updateObject, { downCounterBeforeReset: 0 })
-    } else {
-      Object.assign(updateObject.$inc, { downCounterBeforeReset: 1 })
-    }
+      if (downCounterLevelReached) {
+        Object.assign(updateObject, { downCounterBeforeReset: 0 })
+      } else {
+        Object.assign(updateObject.$inc, { downCounterBeforeReset: 1 })
+      }
 
-    if (downCounterLevelReached && sendMailOnFailure) {
-      updateObject.lastFailureEmailSentOn = now
-
-      const { subject, body } = siteDownEmailFormat({
-        userName: user.userName,
-        website: url,
-        downTime: now
-      })
-
-      await sendMail({
-        subject,
-        body,
-        from: "test@test.com",
-        to: user.email
-      })
+      if (downCounterLevelReached) {
+        updateObject.lastFailureEmailSentOn = now
+  
+        const { subject, body } = siteDownEmailFormat({
+          userName: user.userName,
+          website: url,
+          downTime: now
+        })
+  
+        await sendMail({
+          subject,
+          body,
+          from: config.officialEmail,
+          to: user.email
+        })
+      }
     }
   }
 

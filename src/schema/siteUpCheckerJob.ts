@@ -25,8 +25,7 @@ const siteUpCheckerJobSchema = new Schema<SiteUpCheckerJob, Model<SiteUpCheckerJ
     enum: Object.values(statusTypes)
   },
   resetAfterDownCount: {
-    type: Number,
-    required: true,
+    type: Number
   },
   totalDownCounter: {
     type: Number,
@@ -48,7 +47,8 @@ const siteUpCheckerJobSchema = new Schema<SiteUpCheckerJob, Model<SiteUpCheckerJ
     type: Number
   },
   sendMailOnFailure: {
-    type: Boolean
+    type: Boolean,
+    required: true
   },
   lastFailureEmailSentOn: {
     type: Number
@@ -74,7 +74,7 @@ export interface ISiteUpCheckerJob {
   url: string;
   cron: string;
   status: string;
-  resetAfterDownCount: number;
+  resetAfterDownCount?: number;
   totalDownCounter: number;
   downCounterBeforeReset: number;
   sendMailOnFailure: boolean;

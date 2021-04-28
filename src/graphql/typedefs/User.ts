@@ -39,7 +39,9 @@ export const user = gql`
   }
 
   extend type Mutation {
-    createUser(input: CreateUserInput!): User!
+    createUser(input: CreateUserInput!): String!
+    verifyUser(token: String!): User!
+    resenedVericiationMail(email: String!): String!
     logout: String!
   }
 `

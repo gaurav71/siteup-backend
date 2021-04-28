@@ -1,5 +1,11 @@
 import { Schema, Document, model, Model } from 'mongoose';
 
+export const userStatusTypes = Object.freeze({
+  UNVERIFIED: 'UNVERIFIED',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+})
+
 const userSchema = new Schema<User, Model<User>>({
   userName: {
     type: String,
@@ -29,6 +35,11 @@ const userSchema = new Schema<User, Model<User>>({
   sendMailOnFailure: {
     type: Boolean,
     required: true
+  },
+  status: {
+    type: Object.values(userStatusTypes),
+    required: true,
+    default: userStatusTypes.UNVERIFIED
   }
 });
 
@@ -45,6 +56,7 @@ export interface IUser {
   userType: string;
   sendMailOnFailure: boolean;
   secret: string;
+  status: string;
 }
 
 interface User extends IUser, Document {

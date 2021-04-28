@@ -1,3 +1,5 @@
+import { User } from "../schema"
+
 interface siteDownEmailFormatInput {
   userName: string;
   website: string;
@@ -10,5 +12,14 @@ export const siteDownEmailFormat = (input: siteDownEmailFormatInput) => {
   return {
     subject: `${website} is down.`,
     body: `Hi ${userName}, ${website} is down. Last checked on ${new Date(downTime).toTimeString()}.`
+  }
+}
+
+export const userAccountCreatedEmailFormat = (user: User, token: string) => {
+  const url = `https://siteup.gauravkalyan.com/verify-user?token=${token}`
+
+  return {
+    subject: 'Account Created',
+    html: `Hi ${user.userName}, your account is created. Click <a target="_blank" href="${url}">here<a/> to verify.`
   }
 }
