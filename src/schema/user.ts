@@ -37,7 +37,8 @@ const userSchema = new Schema<User, Model<User>>({
     required: true
   },
   status: {
-    type: Object.values(userStatusTypes),
+    type: String,
+    enum: Object.values(userStatusTypes),
     required: true,
     default: userStatusTypes.UNVERIFIED
   }
