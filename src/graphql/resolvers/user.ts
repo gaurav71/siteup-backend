@@ -1,7 +1,7 @@
 
 import { Context } from '../../@types/context'
-import { createUserController, getUserFromSession, loginUserController, logoutController, resendVerificationMailController, verifyUserController } from '../../controllers/user'
-import { CreateUserInput, LoginUserInput } from '../typedefs/User'
+import { createUserController, getUserFromSession, loginUserController, logoutController, resendVerificationMailController, updateUserController, verifyUserController } from '../../controllers/user'
+import { CreateUserInput, LoginUserInput, UpdateUserInput } from '../typedefs/User'
 
 export const user = (parent: any, args: any, context: Context, info: any) => {
   return getUserFromSession(context)
@@ -9,6 +9,10 @@ export const user = (parent: any, args: any, context: Context, info: any) => {
 
 export const createUser = (parent: any, args: { input: CreateUserInput }, context: Context, info: any) => {
   return createUserController(args.input, context)
+}
+
+export const updateUser = (parent: any, args: { input: UpdateUserInput }, context: Context, info: any) => {
+  return updateUserController(args.input, context)
 }
 
 export const verifyUser = (parent: any, args: { token: string }, context: Context, info: any) => {

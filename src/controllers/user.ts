@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js'
 import { v4 as uuidv4 } from 'uuid'
 import { Context } from "../@types/context"
 import { config } from '../config/config'
-import { CreateUserInput, LoginUserInput } from "../graphql/typedefs/User"
+import { CreateUserInput, LoginUserInput, UpdateUserInput } from "../graphql/typedefs/User"
 import { User } from "../schema"
 import { userStatusTypes } from '../schema/user'
 import { sendMail } from '../services/mailer'
@@ -58,6 +58,22 @@ export const createUserController = async(input: CreateUserInput, context: Conte
   await sendVerificationMail(user)
 
   return 'Email with verification link is sent to your email.'
+}
+
+export const updateUserController = async(input: UpdateUserInput, context: Context) => {
+  checkAuth(context)
+
+  const user = await User.findById(context.req.session.userId)
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  return User.findOneAndUpdate(
+    { _id: user._id },
+    { ...input },
+    { new: true }
+  )
 }
 
 export const resendVerificationMailController = async(email: string) => {

@@ -12,6 +12,10 @@ export interface LoginUserInput {
   password: string;
 }
 
+export interface UpdateUserInput {
+  sendMailOnFailure: boolean;
+}
+
 export const user = gql`
   type User {
     _id: String!
@@ -33,6 +37,10 @@ export const user = gql`
     password: String!
   }
 
+  input UpdateUserInput {
+    sendMailOnFailure: Boolean!
+  }
+
   extend type Query {
     user: User!
     login(input: LoginUserInput!): User!
@@ -41,6 +49,7 @@ export const user = gql`
   extend type Mutation {
     createUser(input: CreateUserInput!): String!
     verifyUser(token: String!): User!
+    updateUser(input: UpdateUserInput!): User!
     resenedVericiationMail(email: String!): String!
     logout: String!
   }

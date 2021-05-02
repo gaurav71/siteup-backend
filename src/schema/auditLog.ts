@@ -20,7 +20,7 @@ const auditLogSchema = new Schema<AuditLog, Model<AuditLog>>({
     required: true
   },
   createdOn: {
-    type: String,
+    type: Number,
     required: true,
     default: Date.now
   }

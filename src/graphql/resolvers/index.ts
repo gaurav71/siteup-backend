@@ -1,5 +1,6 @@
 import {
   createUser,
+  updateUser,
   verifyUser,
   resenedVericiationMail,
   login,
@@ -36,6 +37,7 @@ export const queries = {
 
 export const mutations = {
   createUser,
+  updateUser,
   verifyUser,
   logout,
   createSiteUpCheckerJob,
