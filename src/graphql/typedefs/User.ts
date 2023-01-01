@@ -4,7 +4,6 @@ export interface CreateUserInput {
   userName: string;
   email: string;
   password: string;
-  sendMailOnFailure: boolean;
 }
 
 export interface LoginUserInput {
@@ -29,7 +28,6 @@ export const user = gql`
     userName: String!
     email: String!
     password: String!
-    sendMailOnFailure: Boolean!
   }
 
   input LoginUserInput {

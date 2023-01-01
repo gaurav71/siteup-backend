@@ -1,3 +1,4 @@
+import { config } from "../config/config";
 import { User } from "../schema"
 
 interface siteDownEmailFormatInput {
@@ -16,7 +17,7 @@ export const siteDownEmailFormat = (input: siteDownEmailFormatInput) => {
 }
 
 export const userAccountCreatedEmailFormat = (user: User, token: string) => {
-  const url = `https://siteup.gauravkalyan.com/verify-user?token=${token}`
+  const url = `${config.frontEndBaseUrl}/verify-user?token=${token}`
 
   return {
     subject: 'Account Created',

@@ -48,7 +48,7 @@ export const createUserController = async(input: CreateUserInput, context: Conte
     userName: input.userName,
     email: input.email,
     password: hashedPassword,
-    sendMailOnFailure: input.sendMailOnFailure,
+    sendMailOnFailure: false,
     status: userStatusTypes.UNVERIFIED,
     secret
   })

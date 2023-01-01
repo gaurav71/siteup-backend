@@ -4,7 +4,8 @@ import { config } from '../config/config'
 export const connectToDb = () => new Promise((resolve, reject) => {
   mongoose.connect(config.mongo.uri, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    dbName: config.mongo.dbName
   })
 
   const db = mongoose.connection
