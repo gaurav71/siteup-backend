@@ -13,6 +13,9 @@ export const config = {
     port: Number(process.env.REDIS_PORT),
     password: process.env.REDIS_PASS
   },
+  google: {
+    oauth2ClientId: process.env.GOOGLE_OAUTH2_CLIENT_ID
+  },
   session: {
     name: process.env.SESSION_NAME,
     secret: process.env.SESSION_SECRET,

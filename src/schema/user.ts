@@ -3,7 +3,8 @@ import { Schema, Document, model, Model } from 'mongoose';
 export const userStatusTypes = Object.freeze({
   UNVERIFIED: 'UNVERIFIED',
   ACTIVE: 'ACTIVE',
-  ARCHIVED: 'ARCHIVED'
+  ARCHIVED: 'ARCHIVED',
+  ONLY_OAUTH_VERIFIED: 'ONLY_AUTH_VERIFIED'
 })
 
 const userSchema = new Schema<User, Model<User>>({

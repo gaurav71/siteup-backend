@@ -14,6 +14,7 @@ declare global {
       SESSION_NAME: string;
       SESSION_SECRET: string;
       SAME_SITE: "lax" | "strict" | "none";
+      GOOGLE_OAUTH2_CLIENT_ID: string;
     }
   }
 }

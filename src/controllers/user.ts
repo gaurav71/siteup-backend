@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js'
 import { v4 as uuidv4 } from 'uuid'
-import { Context } from "../@types/context"
+import { Context, EnhancedRequest } from "../@types/context"
 import { config } from '../config/config'
 import { CreateUserInput, LoginUserInput, UpdateUserInput } from "../graphql/typedefs/User"
 import { User } from "../schema"
@@ -9,6 +9,15 @@ import { sendMail } from '../services/mailer'
 import { delRedisKey, getRedisKey, REDIS_KEY_PREFIXES, setRedisKey } from '../services/redis'
 import { checkAuth } from "../utilities/checkAuth"
 import { userAccountCreatedEmailFormat } from '../utilities/messageFormatter'
+import { verifyGoogleToken } from './oauth'
+
+const getCleanUser = (user: User) => ({
+  _id: user._id,
+  userName: user.userName,
+  email: user.email,
+  userType: user.userType,
+  sendMailOnFailure: user.sendMailOnFailure
+})
 
 const sendVerificationMail = async(user: User) => {
   const verificationToken = uuidv4()
@@ -69,11 +78,13 @@ export const updateUserController = async(input: UpdateUserInput, context: Conte
     throw new Error('User not found')
   }
 
-  return User.findOneAndUpdate(
+  const updatedUser = await User.findOneAndUpdate(
     { _id: user._id },
     { ...input },
     { new: true }
   )
+
+  return getCleanUser(updatedUser)
 }
 
 export const resendVerificationMailController = async(email: string) => {
@@ -109,10 +120,12 @@ export const verifyUserController = async(token: string, context: Context) => {
 
   context.req.session.userId = parsedTokenDetails.userId
 
-  return User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { _id: parsedTokenDetails.userId },
     { status: userStatusTypes.ACTIVE }
   )
+
+  return getCleanUser(user)
 }
 
 export const loginUserController = async(input: LoginUserInput, context: Context) => {
@@ -141,13 +154,49 @@ export const loginUserController = async(input: LoginUserInput, context: Context
 
   context.req.session.userId = user._id
 
-  return user
+  return getCleanUser(user)
+}
+
+export const loginGoogleOauthUser = async(req: EnhancedRequest, payload: any) => {
+  const userData = await verifyGoogleToken(payload.credential)
+
+  if (!userData) {
+    throw new Error('User not found')
+  }
+
+  let user = await User.findOne({ email: userData.email })
+
+  if (!user) {
+    const uuid = uuidv4()
+
+    const userDoc = new User({
+      userName: userData.email,
+      email: userData.email,
+      password: uuid,
+      sendMailOnFailure: false,
+      status: userStatusTypes.ONLY_OAUTH_VERIFIED,
+      secret: uuid
+    })
+
+    user = await userDoc.save()
+  }
+
+  const allowedUserStatuses: string[] = [userStatusTypes.ACTIVE, userStatusTypes.ONLY_OAUTH_VERIFIED]
+
+  if (!allowedUserStatuses.includes(user.status)) {
+    throw new Error('User not found')
+  }
+
+  req.session.userId = user._id
+
+  return getCleanUser(user)
 }
 
 export const getUserFromSession = async(context: Context) => {
+  console.log(context.req.session)
   checkAuth(context)
-
-  return User.findById(context.req.session.userId)
+  const user = await User.findById(context.req.session.userId)
+  return getCleanUser(user)
 }
 
 export const logoutController = async(context: Context) => {
