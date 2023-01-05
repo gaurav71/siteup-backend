@@ -8,7 +8,7 @@ export const user = (parent: any, args: any, context: Context, info: any) => {
 }
 
 export const createUser = (parent: any, args: { input: CreateUserInput }, context: Context, info: any) => {
-  return createUserController(args.input, context)
+  return createUserController(args.input)
 }
 
 export const updateUser = (parent: any, args: { input: UpdateUserInput }, context: Context, info: any) => {

@@ -24,9 +24,11 @@ const userSchema = new Schema<User, Model<User>>({
     type: String,
     required: true
   },
-  secret: {
+  emailVerificationToken: {
     type: String,
-    required: true
+  },
+  emailVerificationTokenExpiresOn: {
+    type: Number,
   },
   userType: {
     type: String,
@@ -57,7 +59,8 @@ export interface IUser {
   password: string;
   userType: string;
   sendMailOnFailure: boolean;
-  secret: string;
+  emailVerificationToken?: string;
+  emailVerificationTokenExpiresOn?: number;
   status: string;
 }
 

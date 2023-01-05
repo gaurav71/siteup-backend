@@ -4,6 +4,7 @@ export const config = {
   port: process.env.PORT,
   apiHost: process.env.API_HOST,
   frontEndBaseUrl: process.env.FRONTEND_HOST,
+  cryptoSecret: process.env.CRYPTO_SECRET,
   mongo: {
     uri: process.env.DB_HOST,
     dbName: process.env.DB_NAME

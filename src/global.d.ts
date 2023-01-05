@@ -15,6 +15,7 @@ declare global {
       SESSION_SECRET: string;
       SAME_SITE: "lax" | "strict" | "none";
       GOOGLE_OAUTH2_CLIENT_ID: string;
+      CRYPTO_SECRET: string;
     }
   }
 }

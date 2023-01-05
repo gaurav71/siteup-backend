@@ -6,7 +6,6 @@ import { CreateUserInput, LoginUserInput, UpdateUserInput } from "../graphql/typ
 import { User } from "../schema"
 import { userStatusTypes } from '../schema/user'
 import { sendMail } from '../services/mailer'
-import { delRedisKey, getRedisKey, REDIS_KEY_PREFIXES, setRedisKey } from '../services/redis'
 import { checkAuth } from "../utilities/checkAuth"
 import { userAccountCreatedEmailFormat } from '../utilities/messageFormatter'
 import { verifyGoogleToken } from './oauth'
@@ -22,9 +21,9 @@ const getCleanUser = (user: User) => ({
 const sendVerificationMail = async(user: User) => {
   const verificationToken = uuidv4()
 
-  await setRedisKey(
-    `${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${verificationToken}`,
-    JSON.stringify({ userId: user._id, creationTime: Date.now() })
+  await User.findOneAndUpdate(
+    { _id: user._id },
+    { emailVerificationToken: verificationToken }
   )
 
   sendMail({
@@ -34,7 +33,7 @@ const sendVerificationMail = async(user: User) => {
   })
 }
 
-export const createUserController = async(input: CreateUserInput, context: Context) => {
+export const createUserController = async(input: CreateUserInput) => {
   const userAlreadyCreated = await User.findOne({
     $or: [
       { email: input.email },
@@ -45,13 +44,10 @@ export const createUserController = async(input: CreateUserInput, context: Conte
   if (userAlreadyCreated) {
     const sameEmail = userAlreadyCreated.email === input.email
     const message = sameEmail ? 'Email already used' : 'Username already taken'
-
     throw new Error(message)
   }
 
-  const secret = uuidv4()
-
-  const hashedPassword = CryptoJS.AES.encrypt(input.password, secret).toString()
+  const hashedPassword = CryptoJS.AES.encrypt(input.password, config.cryptoSecret).toString()
 
   const userDoc = new User({
     userName: input.userName,
@@ -59,11 +55,9 @@ export const createUserController = async(input: CreateUserInput, context: Conte
     password: hashedPassword,
     sendMailOnFailure: false,
     status: userStatusTypes.UNVERIFIED,
-    secret
   })
 
   const user = await userDoc.save()
-
   await sendVerificationMail(user)
 
   return 'Email with verification link is sent to your email.'
@@ -104,24 +98,23 @@ export const resendVerificationMailController = async(email: string) => {
 }
 
 export const verifyUserController = async(token: string, context: Context) => {
-  const tokenDetails: any = await getRedisKey(`${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${token}`)
+  const userWithToken = await User.findOne({
+    emailVerificationToken: token,
+    status: userStatusTypes.UNVERIFIED
+  })
 
-  if (!tokenDetails) {
+  if (!userWithToken) {
     throw new Error('Invalid token')
   }
 
-  const parsedTokenDetails = JSON.parse(tokenDetails)
-
-  await delRedisKey(`${REDIS_KEY_PREFIXES.VERIFICATION_TOKEN}${token}`)
-
-  if (parsedTokenDetails.creationTime + config.verifyUserTimeLimit < Date.now()) {
+  if (userWithToken.emailVerificationTokenExpiresOn < Date.now()) {
     throw new Error('Token expired')
   }
 
-  context.req.session.userId = parsedTokenDetails.userId
+  context.req.session.userId = userWithToken._id
 
   const user = await User.findOneAndUpdate(
-    { _id: parsedTokenDetails.userId },
+    { _id: userWithToken._id },
     { status: userStatusTypes.ACTIVE }
   )
 
@@ -137,7 +130,7 @@ export const loginUserController = async(input: LoginUserInput, context: Context
     throw new Error('User not found')
   }
  
-  const bytes  = CryptoJS.AES.decrypt(user.password, user.secret)
+  const bytes  = CryptoJS.AES.decrypt(user.password, user.emailVerificationToken)
   const originalPassword = bytes.toString(CryptoJS.enc.Utf8)
 
   if (originalPassword !== input.password) {
@@ -175,7 +168,7 @@ export const loginGoogleOauthUser = async(req: EnhancedRequest, payload: any) =>
       password: uuid,
       sendMailOnFailure: false,
       status: userStatusTypes.ONLY_OAUTH_VERIFIED,
-      secret: uuid
+      emailVerificationToken: uuid
     })
 
     user = await userDoc.save()
