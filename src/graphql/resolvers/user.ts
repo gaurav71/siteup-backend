@@ -27,6 +27,6 @@ export const login = (parent: any, args: { input: LoginUserInput }, context: Con
   return loginUserController(args.input, context)
 }
 
-export const logout = (parent: any, args: any, context: Context, info: any) => {
-  return logoutController(context)
+export const logout = async (parent: any, args: any, context: Context, info: any) => {
+  return await logoutController(context)
 }

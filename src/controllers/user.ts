@@ -23,7 +23,10 @@ const sendVerificationMail = async(user: User) => {
 
   await User.findOneAndUpdate(
     { _id: user._id },
-    { emailVerificationToken: verificationToken }
+    {
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiresOn: Date.now() + config.verifyUserTimeLimit
+    }
   )
 
   sendMail({
@@ -130,7 +133,7 @@ export const loginUserController = async(input: LoginUserInput, context: Context
     throw new Error('User not found')
   }
  
-  const bytes  = CryptoJS.AES.decrypt(user.password, user.emailVerificationToken)
+  const bytes  = CryptoJS.AES.decrypt(user.password, config.cryptoSecret)
   const originalPassword = bytes.toString(CryptoJS.enc.Utf8)
 
   if (originalPassword !== input.password) {
@@ -168,7 +171,6 @@ export const loginGoogleOauthUser = async(req: EnhancedRequest, payload: any) =>
       password: uuid,
       sendMailOnFailure: false,
       status: userStatusTypes.ONLY_OAUTH_VERIFIED,
-      emailVerificationToken: uuid
     })
 
     user = await userDoc.save()
@@ -186,7 +188,6 @@ export const loginGoogleOauthUser = async(req: EnhancedRequest, payload: any) =>
 }
 
 export const getUserFromSession = async(context: Context) => {
-  console.log(context.req.session)
   checkAuth(context)
   const user = await User.findById(context.req.session.userId)
   return getCleanUser(user)
