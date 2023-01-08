@@ -16,6 +16,11 @@ declare global {
       SAME_SITE: "lax" | "strict" | "none";
       GOOGLE_OAUTH2_CLIENT_ID: string;
       CRYPTO_SECRET: string;
+      SMTP_SERVER_HOST: string;
+      SMTP_SERVER_PORT: string;
+      SMTP_SERVER_EMAIL: string;
+      SMTP_SERVER_USER: string;
+      SMTP_SERVER_KEY: string;
     }
   }
 }

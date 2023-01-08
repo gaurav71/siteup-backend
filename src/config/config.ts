@@ -29,6 +29,13 @@ export const config = {
       httpOnly: true
     }
   },
+  emailServer: {
+    host: process.env.SMTP_SERVER_HOST,
+    port: Number(process.env.SMTP_SERVER_PORT),
+    email: process.env.SMTP_SERVER_EMAIL,
+    user: process.env.SMTP_SERVER_USER,
+    key: process.env.SMTP_SERVER_KEY,
+  },
   officialEmail: 'test@mail.com',
   verifyUserTimeLimit: 1000 * 60 * 2,
 }

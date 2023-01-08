@@ -31,7 +31,7 @@ const sendVerificationMail = async(user: User) => {
 
   sendMail({
     to: user.email,
-    from: config.officialEmail,
+    from: config.emailServer.email,
     ...userAccountCreatedEmailFormat(user, verificationToken)
   })
 }
