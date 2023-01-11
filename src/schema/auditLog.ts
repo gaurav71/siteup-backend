@@ -1,11 +1,5 @@
 import { Schema, Document, model, Model } from 'mongoose';
 
-export const statusTypes = Object.freeze({
-  RUNNING: 'RUNNING',
-  PAUSED: 'PAUSED',
-  STOPPED: 'STOPPED'
-})
-
 const auditLogSchema = new Schema<AuditLog, Model<AuditLog>>({
   userId: {
     type: String,

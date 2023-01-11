@@ -17,7 +17,7 @@ export const getSiteUpCheckerJobByIdController = async(jobId: string, context: C
     throw new Error("Job not found")
   }
   
-  return SiteUpCheckerJob.findById(jobId)
+  return job
 }
 
 export const getUserSiteUpCheckerJobsController = (context: Context) => {
